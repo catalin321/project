@@ -1,26 +1,43 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {Component, useRef, useEffect } from 'react';
 import './App.css';
+import jsonData from './resources/people';
+import Chips from './components/Chips';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+export default class App extends Component {
+  constructor(props) {
+		super(props);
+		this.state = {
+      entries: []
+		}
+  }
+
+  componentDidMount() {
+    this.parseData(jsonData)
+      .then(list => {
+        const entries = list.map( value => { 
+          const {entry : {...entry}} = value; 
+          return { 
+            ...entry, editMode: false
+          };
+        });
+        return entries;
+      })
+      .then(entries => this.setState({ entries }));
+  }
+
+  parseData = data => {
+    return new Promise( resolve => {
+        const { list : { entries } } = data; 
+        resolve(entries);
+      }
+    )
+  }
+
+  render() {
+
+    const entries = this.state.entries;
+    return (
+      entries.length > 0 && <Chips entries={entries} />
+    )
+	}
 }
-
-export default App;
